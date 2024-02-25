@@ -13,14 +13,14 @@ class SensorError(Exception):
     pass
 
 class SensorReadoutError(SensorError):
-    def __init__(self, reserved_value: int):
-        self.reserved_value: int = reserved_value
+    def __init__(self, reserved_value: str):
+        self.reserved_value: str = reserved_value
         super().__init__(f"Error with sensor readout: {reserved_value=}")
 
 class SensorData(pydantic.BaseModel):
     co2: Annotated[int, pydantic.Field(gt=0)]
-    temperature: int
-    pressure: int
+    temperature: float
+    pressure: float
 
 
 def fetch_sensor_data(i2cbus: SMBus) -> SensorData:
@@ -29,9 +29,8 @@ def fetch_sensor_data(i2cbus: SMBus) -> SensorData:
     # reserved value - useful to check that the sensor is reading out correctly
     # this should be 0x8000
     reserved = read_data[4].to_bytes(1, "big") + read_data[5].to_bytes(1, "big")
-    reserved = int(f"0x{reserved.hex()}")
-    if reserved != 0x8000:
-        raise SensorReadoutError(reserved)
+    if (reserved_hex := reserved.hex()) != "8000":
+        raise SensorReadoutError(reserved_hex)
 
     co2 = read_data[0].to_bytes(1, "big") + read_data[1].to_bytes(1, "big")
     temperature = read_data[2].to_bytes(1, "big") + read_data[3].to_bytes(1, "big")
