@@ -16,7 +16,10 @@ class SensorError(Exception):
 class SensorReadoutError(SensorError):
     def __init__(self, reserved_value: str):
         self.reserved_value: str = reserved_value
-        super().__init__(f"Error with sensor readout: {reserved_value=}")
+        super().__init__(
+            f"Error with sensor readout: reserved value is {reserved_value}, should be "
+            f"8000."
+        )
 
 
 class SensorData(pydantic.BaseModel):
