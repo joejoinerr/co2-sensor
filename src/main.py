@@ -45,6 +45,8 @@ def fetch_sensor_data(i2cbus: SMBus) -> SensorData:
 
 def main():
     i2cbus = SMBus(1)
+    # delay recommended according to this stackoverflow post
+    # https://stackoverflow.com/questions/52735862/getting-ioerror-errno-121-remote-i-o-error-with-smbus-on-python-raspberry-w
     time.sleep(1)
 
     sensor_data = fetch_sensor_data(i2cbus)
