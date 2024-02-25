@@ -20,7 +20,7 @@ class SensorReadoutError(SensorError):
 class SensorData(pydantic.BaseModel):
     co2: Annotated[int, pydantic.Field(gt=0)]
     temperature: float
-    pressure: float
+    pressure: Annotated[float, pydantic.Field(gt=0)]
 
 
 def fetch_sensor_data(i2cbus: SMBus) -> SensorData:
