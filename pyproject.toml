@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "co2-sensor"
+version = "0.1.0"
+description = ""
+authors = ["Joe Joiner <2454320+joejoinerr@users.noreply.github.com>"]
+readme = "README.md"
+packages = [{include = "co2_sensor"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+smbus2 = "^0.4.3"
+pydantic = "^2.6.2"
+loguru = "^0.7.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
