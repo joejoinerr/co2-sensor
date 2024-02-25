@@ -12,10 +12,12 @@ I2CREGISTER = 0x00
 class SensorError(Exception):
     pass
 
+
 class SensorReadoutError(SensorError):
     def __init__(self, reserved_value: str):
         self.reserved_value: str = reserved_value
         super().__init__(f"Error with sensor readout: {reserved_value=}")
+
 
 class SensorData(pydantic.BaseModel):
     co2: Annotated[int, pydantic.Field(gt=0)]
