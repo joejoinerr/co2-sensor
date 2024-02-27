@@ -1,6 +1,7 @@
 import time
 from typing import Annotated
 
+import httpx
 import pydantic
 from smbus2 import SMBus
 
@@ -59,6 +60,16 @@ def fetch_sensor_data(i2cbus: SMBus) -> SensorData:
     )
 
 
+def record_reading(sensor_data: SensorData):
+    record_data = {
+        "co2_ppm": sensor_data.co2,
+        "temp_celcius": sensor_data.temperature,
+        "pressure_mbar": sensor_data.pressure,
+    }
+    response = httpx.post("https://localhost:8080/api/submit", json=record_data)
+    response.raise_for_status()
+
+
 def main():
     i2cbus = SMBus(1)
     # delay recommended according to this stackoverflow post
@@ -66,9 +77,10 @@ def main():
     time.sleep(1)
 
     sensor_data = fetch_sensor_data(i2cbus)
-    print(f"Temperature: {sensor_data.temperature}\N{DEGREE SIGN}C")
-    print(f"CO\N{SUBSCRIPT TWO}: {sensor_data.co2}ppm")
-    print(f"Pressure: {sensor_data.pressure}mbar")
+    record_reading(sensor_data)
+    # print(f"Temperature: {sensor_data.temperature}\N{DEGREE SIGN}C")
+    # print(f"CO\N{SUBSCRIPT TWO}: {sensor_data.co2}ppm")
+    # print(f"Pressure: {sensor_data.pressure}mbar")
 
 
 if __name__ == "__main__":
