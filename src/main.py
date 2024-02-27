@@ -66,7 +66,7 @@ def record_reading(sensor_data: SensorData):
         "temp_celcius": sensor_data.temperature,
         "pressure_mbar": sensor_data.pressure,
     }
-    response = httpx.post("https://localhost:8080/api/submit", json=record_data)
+    response = httpx.post("http://localhost:8080/api/submit", json=record_data)
     response.raise_for_status()
 
 
