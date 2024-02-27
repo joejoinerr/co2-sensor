@@ -12,6 +12,11 @@ class SensorError(Exception):
     pass
 
 
+class SensorUnreadableError(SensorError):
+    def __init__(self):
+        super().__init__("Sensor data cannot be read. Is the sensor connected?")
+
+
 class SensorReadoutError(SensorError):
     def __init__(self, reserved_value: str):
         self.reserved_value: str = reserved_value
@@ -27,8 +32,15 @@ class SensorData(pydantic.BaseModel):
     pressure: Annotated[float, pydantic.Field(gt=0)]
 
 
+def _read_sensor(i2cbus: SMBus) -> list[int]:
+    try:
+        return i2cbus.read_i2c_block_data(EE895ADDRESS, I2CREGISTER, 8)
+    except OSError:
+        raise SensorUnreadableError()
+
+
 def fetch_sensor_data(i2cbus: SMBus) -> SensorData:
-    read_data = i2cbus.read_i2c_block_data(EE895ADDRESS, I2CREGISTER, 8)
+    read_data = _read_sensor(i2cbus)
 
     # reserved value - useful to check that the sensor is reading out correctly
     # this should be 0x8000
