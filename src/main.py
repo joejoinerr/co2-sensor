@@ -63,7 +63,7 @@ def fetch_sensor_data(i2cbus: SMBus) -> SensorData:
 def record_reading(sensor_data: SensorData):
     record_data = {
         "co2_ppm": sensor_data.co2,
-        "temp_celcius": sensor_data.temperature,
+        "temp_celsius": sensor_data.temperature,
         "pressure_mbar": sensor_data.pressure,
     }
     response = httpx.post("http://localhost:8080/api/submit", json=record_data)
