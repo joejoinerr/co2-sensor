@@ -56,7 +56,7 @@ def main():
     sensor_data = fetch_sensor_data(i2cbus)
     print(f"Temperature: {sensor_data.temperature}\N{DEGREE SIGN}C")
     print(f"CO\N{SUBSCRIPT TWO}: {sensor_data.co2}ppm")
-    print(f"Pressure: {sensor_data.pressure}ppm")
+    print(f"Pressure: {sensor_data.pressure}mbar")
 
 
 if __name__ == "__main__":
