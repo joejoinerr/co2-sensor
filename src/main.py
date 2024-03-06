@@ -3,6 +3,8 @@ from typing import Annotated
 
 import httpx
 import pydantic
+import tenacity
+from loguru import logger
 from smbus2 import SMBus
 
 EE895ADDRESS = 0x5E
@@ -60,7 +62,8 @@ def fetch_sensor_data(i2cbus: SMBus) -> SensorData:
     )
 
 
-def record_reading(sensor_data: SensorData):
+@tenacity.retry(stop=tenacity.stop_after_attempt(3), wait=tenacity.wait_fixed(3))
+def record_reading_api(sensor_data: SensorData):
     record_data = {
         "co2_ppm": sensor_data.co2,
         "temp_celsius": sensor_data.temperature,
@@ -70,17 +73,19 @@ def record_reading(sensor_data: SensorData):
     response.raise_for_status()
 
 
+@logger.catch
 def main():
+
     i2cbus = SMBus(1)
     # delay recommended according to this stackoverflow post
     # https://stackoverflow.com/questions/52735862/getting-ioerror-errno-121-remote-i-o-error-with-smbus-on-python-raspberry-w
     time.sleep(1)
 
-    sensor_data = fetch_sensor_data(i2cbus)
-    record_reading(sensor_data)
-    # print(f"Temperature: {sensor_data.temperature}\N{DEGREE SIGN}C")
-    # print(f"CO\N{SUBSCRIPT TWO}: {sensor_data.co2}ppm")
-    # print(f"Pressure: {sensor_data.pressure}mbar")
+    while True:
+        sensor_data = fetch_sensor_data(i2cbus)
+        record_reading_api(sensor_data)
+
+        time.sleep(60)
 
 
 if __name__ == "__main__":
